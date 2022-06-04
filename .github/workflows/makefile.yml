@@ -1,27 +1,95 @@
-name: Makefile CI
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1
+[
+  <!ENTITY % entities SYSTEM "generic-entities.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="cha-configure-rdp">
+  <title>Connecting via RDP</title>
+  <para>
+   If you installed &s4sa; with the RDP option activated or if you installed
+   from a &kiwi; image, RDP is enabled on the machine via the service
+   <systemitem class="daemon">xrdp</systemitem>. Alternatively, you can enable
+   RDP later as described at the end of this section.
+  </para>
+  <para>
+   You can connect using any software that supports RDP, such as:
+  </para>
+  <itemizedlist>
+   <listitem>
+    <formalpara>
+     <title>Linux:</title>
+     <para>
+      Vinagre (available in &sled;/&slewea; and &opensuse;) or
+      Remmina (available in &opensuse;)
+     </para>
+    </formalpara>
+   </listitem>
+   <listitem>
+    <formalpara>
+     <title>Windows:</title>
+     <para>
+      Remote Desktop Connection
+     </para>
+    </formalpara>
+   </listitem>
+  </itemizedlist>
+  <important>
+   <title>Connection parameters</title>
+   <para>
+    Make sure to set up the connection with the following parameters:
+   </para>
+   <itemizedlist>
+    <listitem>
+     <formalpara>
+      <title>Port:</title>
+      <para>
+       3389
+      </para>
+     </formalpara>
+    </listitem>
+    <listitem>
+     <formalpara>
+      <title>Color depth:</title>
+      <para>
+       16-bit or 24-bit only
+      </para>
+     </formalpara>
+    </listitem>
+   </itemizedlist>
+  </important>
 
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
-jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: configure
-      run: ./configure
-      
-    - name: Install dependencies
-      run: make
-      
-    - name: Run check
-      run: make check
-      
-    - name: Run distcheck
-      run: make distcheck
+  <procedure xml:id="pro-enable-rdp">
+   <title>Setting up RDP</title>
+   <!-- I could use the package yast2-rdp but it does not have support (says
+   YaST), so avoid that. - sknorr, 2016-12-02 -->
+   <para>
+    If you have not set up an RDP connection during the installation, you can
+    also do so later using the following instructions.
+   </para>
+   <step>
+    <para>
+     First, create the necessary exception for your firewall, opening port
+     TCP 3389 in all relevant zones.
+     For example, if your internal network uses the <literal>internal</literal>
+     zone, use the following command:
+    </para>
+    <screen>&prompt.root;<command>firewall-cmd</command> --zone=internal --add-port=3389/tcp</screen>
+    <para>
+     This is a temporary assignment for testing the new setting. If you need to change
+     more than one zone, change and test each zone one at a time.
+    </para>
+   </step>
+   <step>
+    <para>
+     When you are satisfied that new configuration is correct, make it permanent:
+    </para>
+    <screen>&prompt.root;<command>firewall-cmd</command> --runtime-to-permanent
+&prompt.root;<command>firewall-cmd</command> --reload</screen>
+   </step>
+  </procedure>
+ <para>
+  Find more information on using firewalld in
+  <link xlink:href="https://docs.suse.com/sles/15/html/SLES-all/cha-security-firewall.html#sec-security-firewall-firewalld"/>.
+ </para>
+ </chapter>
